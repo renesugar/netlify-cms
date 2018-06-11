@@ -70,12 +70,22 @@ export default class GitGateway extends GitHubBackend {
           branch: this.branch,
           tokenPromise: this.tokenPromise,
           commitAuthor: pick(userData, ["name", "email"]),
+          squash_merges: this.squash_merges,
         });
         return userData;
       } else {
         throw new Error("You don't have sufficient permissions to access Netlify CMS");
       }
-    });
+    })
+    .then(userData =>
+      this.api.hasWriteAccess().then(canWrite => {
+        if (canWrite) {
+          return userData;
+        } else {
+          throw new Error("You don't have sufficient permissions to access Netlify CMS");
+        }
+      })
+    );
   }
 
   logout() {

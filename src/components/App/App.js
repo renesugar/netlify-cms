@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { hot } from 'react-hot-loader';
 import ImmutablePropTypes from 'react-immutable-proptypes';
 import { connect } from 'react-redux';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
@@ -83,7 +84,9 @@ class App extends React.Component {
             error: auth && auth.get('error'),
             isFetching: auth && auth.get('isFetching'),
             siteId: this.props.config.getIn(["backend", "site_domain"]),
-            base_url: this.props.config.getIn(["backend", "base_url"], null)
+            base_url: this.props.config.getIn(["backend", "base_url"], null),
+            authEndpoint: this.props.config.getIn(["backend", "auth_endpoint"]),
+            config: this.props.config,
           })
         }
       </div>
@@ -178,4 +181,6 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default hot(module)(
+  connect(mapStateToProps, mapDispatchToProps)(App)
+);

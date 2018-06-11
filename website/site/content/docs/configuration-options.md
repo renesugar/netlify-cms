@@ -1,11 +1,22 @@
 ---
 title: Configuration Options
-position: 23
+weight: 23
+menu:
+  docs:
+    parent: reference
 ---
 
 # Configuration Options
 
 All configuration options for Netlify CMS are specified in the `config.yml` file, in the folder where you access the editor UI (usually in the `/admin` folder).
+
+Alternatively, you can specify a custom config file using a link tag:
+
+```html
+<!-- Note the "type" and "rel" attribute values, which are required. -->
+
+<link href="path/to/config.yml" type="text/yaml" rel="cms-config-url">
+```
 
 To see working configuration examples, you can [start from a template](https://www.netlifycms.org/docs/start-with-a-template) or check out the [CMS demo site](https://cms-demo.netlify.com). (No login required: click the login button and the CMS will open.) You can refer to the demo [configuration code](https://github.com/netlify/netlify-cms/blob/master/example/config.yml) to see how each option was configured.
 
@@ -60,6 +71,34 @@ public_folder: "/images/uploads"
 
 Based on the settings above, if a user used an image widget field called `avatar` to upload and select an image called `philosoraptor.png`, the image would be saved to the repository at `/static/images/uploads/philosoraptor.png`, and the `avatar` field for the file would be set to `/images/uploads/philosoraptor.png`.
 
+## Display URL
+
+When the `display_url` setting is specified, the CMS UI will include a link in the fixed area at the top of the page, allowing content authors to easily return to your main site. The text of the link consists of the URL less the protocol portion (e.g., `your-site.com`).
+
+**Example:**
+
+```yaml
+display_url: https://your-site.com
+```
+
+## Slug Type
+
+The `slug` option allows you to change how filenames for entries are created and sanitized. For modifying the actual data in a slug, see the per-collection option below.
+
+`slug` accepts multiple options:
+
+- `encoding`
+  - `unicode` (default): Sanitize filenames (slugs) according to [RFC3987](https://tools.ietf.org/html/rfc3987) and the [WHATWG URL spec](https://url.spec.whatwg.org/). This spec allows non-ASCII (or non-Latin) characters to exist in URLs.
+  - `ascii`: Sanitize filenames (slugs) according to [RFC3986](https://tools.ietf.org/html/rfc3986). The only allowed characters are (0-9, a-z, A-Z, `_`, `-`, `~`).
+- `clean_accents`: Set to `true` to remove diacritics from slug characters before sanitizing. This is often helpful when using `ascii` encoding.
+
+**Example**
+
+``` yaml
+slug:
+  encoding: "ascii"
+  clean_accents: true
+```
 
 ## Collections
 
@@ -81,6 +120,7 @@ The `collections` setting is the heart of your Netlify CMS configuration, as it 
 - `frontmatter_delimiter`: see detailed description under `format`
 - `slug`: see detailed description below
 - `fields` (required): see detailed description below
+- `editor`: see detailed description below
 
 The last few options require more detailed information.
 
@@ -88,7 +128,7 @@ The last few options require more detailed information.
 
 These settings determine how collection files are parsed and saved. Both are optional—Netlify CMS will attempt to infer your settings based on existing items in the collection. If your collection is empty, or you'd like more control, you can set these fields explicitly.
 
-`extension` determines the file extension searched for when finding existing entries in a folder collection determines the file extension saved for new collection items. It accepts the following values: `yml`, `yaml`, `toml`, `json`, `md`, `markdown`, `html`.
+`extension` determines the file extension searched for when finding existing entries in a folder collection and it determines the file extension used to save new collection items. It accepts the following values: `yml`, `yaml`, `toml`, `json`, `md`, `markdown`, `html`.
 
 You may also specify a custom `extension` not included in the list above, as long as the collection files can be parsed and saved in one of the supported formats below.
 
@@ -115,6 +155,9 @@ For folder collections where users can create new items, the `slug` option speci
 - `{{year}}`: 4-digit year of the file creation date
 - `{{month}}`: 2-digit month of the file creation date
 - `{{day}}`: 2-digit day of the month of the file creation date
+- `{{hour}}`: 2-digit hour of the file creation date
+- `{{minute}}`: 2-digit minute of the file creation date
+- `{{second}}`: 2-digit second of the file creation date
 
 **Example:**
 
@@ -144,9 +187,21 @@ fields:
   - label: "Title"
     name: "title"
     widget: "string"
-    pattern: ['.{10,}', "Must have at least 20 characters"]
+    pattern: ['.{20,}', "Must have at least 20 characters"]
   - {label: "Layout", name: "layout", widget: "hidden", default: "blog"}
   - {label: "Featured Image", name: "thumbnail", widget: "image", required: false}
   - {label: "Body", name: "body", widget: "markdown"}
 ```
 
+### `editor`
+
+This setting changes options for the editor view of the collection. It has one option so far:
+
+- `preview`: set to `false` to disable the preview pane for this collection; defaults to `true`
+
+**Example:**
+
+```yaml
+  editor:
+     preview: false
+```
